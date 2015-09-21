@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GidimoCompass</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="facebook_app_id">406511386204019</string>
+</resources>

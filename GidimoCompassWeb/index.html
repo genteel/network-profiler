@@ -1,0 +1,198 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link rel="stylesheet" href="css/normalize.min.css">
+        <link rel="stylesheet" href="css/main.css">
+
+        <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+        <script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div class="header-container">
+            <header class="wrapper clearfix">
+                <h1 class="title">User Network Map</h1>
+            </header>
+        </div>
+
+        <div class="main-container">
+            <div class="main wrapper clearfix">
+
+                <article>
+                    <section>
+                        <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"data-max-rows="1"
+                                         data-size="xlarge" data-show-faces="false" data-auto-logout-link="true">
+                        </fb:login-button>
+
+                        <div id="status">
+                        </div>
+                    </section>
+                    <section>
+                        <div id="tester" style="width:100%;height:100%;"></div>
+                    </section>
+                </article>
+
+            </div> <!-- #main -->
+        </div> <!-- #main-container -->
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/jstat/1.4.1/jstat.min.js"></script>
+        <script src="js/facebook-login.js"></script>
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>
+
+        <script src="js/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+
+            var firebase = new Firebase('https://intense-torch-4637.firebaseio.com/');
+
+            TESTER = document.getElementById('tester');
+            var x_axis = new Array();
+            var y_axis = new Array();
+            var prevDay = -1;
+            var combineArray = new Array();
+            var i = 0;
+
+            function retrieveFireBase(response){
+                firebase.authWithOAuthToken("facebook", response.authResponse.accessToken, function(error,result) {
+                    if (error == null) {
+                        console.log("Guysssss::::::"+result.uid);
+                        firebase.child("users")
+                                .child(result.uid)
+                                .child('userConnectivities')
+                                .on("value", function (snapshot) {
+                                    console.log("Exists:"+snapshot.exists());
+                                    var meanHolderX = 0;
+                                    var meanHolderY = 0;
+                                    snapshot.forEach(function(snapshotChild){
+                                        if(new Date(snapshotChild.child("time").val()).getDay()!=prevDay){
+                                            prevDay = new Date(snapshotChild.child("time").val()).getDay();
+                                            if(x_axis.length!=0 && y_axis.length!=0){
+                                                combineArray.push(x_axis);
+                                                combineArray.push(y_axis);
+                                                x_axis = [];
+                                                y_axis = [];
+                                                i = 0;
+                                            }
+                                        }else{
+
+                                        }
+                                        i++;
+                                        switch (new Date(snapshotChild.child("time").val()).getHours()){
+                                            case 0:
+                                            case 1:
+                                            case 2:
+                                                x_axis[i]=1;
+                                                var speedDef = snapshotChild.child("speed").val();
+                                                y_axis[i]=speedDef.split(';')[1];
+                                                break;
+                                            case 3:
+                                            case 4:
+                                            case 5:
+                                                x_axis[i]=2;
+                                                var speedDef = snapshotChild.child("speed").val();
+                                                y_axis[i]=speedDef.split(';')[1];
+                                                break;
+                                            case 6:
+                                            case 7:
+                                            case 8:
+                                                x_axis[i]=3;
+                                                var speedDef = snapshotChild.child("speed").val();
+                                                y_axis[i]=speedDef.split(';')[1];
+                                                break;
+                                            case 9:
+                                            case 10:
+                                            case 11:
+                                                x_axis[i]=4;
+                                                var speedDef = snapshotChild.child("speed").val();
+                                                y_axis[i]=speedDef.split(';')[1];
+                                                break;
+                                            case 12:
+                                            case 13:
+                                            case 14:
+                                                x_axis[i]=5;
+                                                var speedDef = snapshotChild.child("speed").val();
+                                                y_axis[i]=speedDef.split(';')[1];
+                                                break;
+                                            case 15:
+                                            case 16:
+                                            case 17:
+                                                x_axis[i]=6;
+                                                var speedDef = snapshotChild.child("speed").val();
+                                                y_axis[i]=speedDef.split(';')[1];
+                                                break;
+                                            case 18:
+                                            case 19:
+                                            case 20:
+                                                x_axis[i]=7;
+                                                var speedDef = snapshotChild.child("speed").val();
+                                                y_axis[i]=speedDef.split(';')[1];
+                                                break;
+                                            case 21:
+                                            case 22:
+                                            case 23:
+                                                x_axis[i]=8;
+                                                var speedDef = snapshotChild.child("speed").val();
+                                                y_axis[i]=speedDef.split(';')[1];
+                                                break;
+                                        }
+                                        console.log();
+                                    });
+                                    var trace1 = {
+                                        x: combineArray[0],
+                                        y: combineArray[1],
+                                        mode: 'markers',
+                                        type:'scatter'
+                                    };
+                                    var trace2 = {
+                                        x: combineArray[2],
+                                        y: combineArray[3],
+                                        mode: 'markers',
+                                        type:'scatter'
+                                    };
+                                    var layout = {
+                                        showlegend: false,
+                                        height: 600,
+                                        width: 600,
+                                        title:'Data Labels Hover'
+                                    };
+                                    Plotly.newPlot(TESTER, [trace1,trace2],layout);
+                        });
+                    }else{
+                        console.log(error);
+                    }
+                });
+            }
+
+            function findPeak(n_array){
+                var middleCol = Math.ceil(n_array[0].length/2);
+            }
+
+
+        </script>
+    </body>
+</html>
